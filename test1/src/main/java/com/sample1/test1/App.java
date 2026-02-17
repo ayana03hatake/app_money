@@ -11,7 +11,7 @@ public class App {
     public static void main(String[] args) {
     	List<Household> householdList = new ArrayList<>();
     	Household household1 = new Household("house", BigDecimal.valueOf(1000));
-    	Household household2 = new Household("house", BigDecimal.valueOf(2000));
+    	Household household2 = new Household("house", BigDecimal.valueOf(3400));
         householdList.add(household1);
         householdList.add(household2);
     	
