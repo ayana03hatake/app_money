@@ -29,7 +29,7 @@ import com.google.gson.reflect.TypeToken;
 
 public class App {
 
-   
+   //確認
     private static final Path DATA_PATH = Path.of("householdList.json");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Type LIST_TYPE = new TypeToken<List<Household>>() {}.getType();
