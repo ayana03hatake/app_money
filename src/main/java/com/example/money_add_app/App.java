@@ -29,12 +29,12 @@ import com.google.gson.reflect.TypeToken;
 
 public class App {
 
-   //確認
-    private static final Path DATA_PATH = Path.of("householdList.json");
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Type LIST_TYPE = new TypeToken<List<Household>>() {}.getType();
+	//確認
+	private static final Path DATA_PATH = Path.of("householdList.json");
+	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	private static final Type LIST_TYPE=new TypeToken<List<Household>>(){}.getType();
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
         JFrame frame = new JFrame("家計簿入力画面");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//閉じるでアプリケーションも終了
 
@@ -48,10 +48,16 @@ public class App {
         JLabel memolabel = new JLabel("メモ");
 
         // 入力欄（ここを _Field に統一）
-        JTextArea dateField = new JTextArea();
+        
+        JTextField dateField = new JTextField(10);
+		JTextField categoryField = new JTextField(15);
+		JTextField priceField = new JTextField(15);
+		JTextField memoField = new JTextField(20);
+         
+       /* JTextArea dateField = new JTextArea();
         JTextArea categoryField = new JTextArea();
         JTextArea priceField = new JTextArea();
-        JTextArea memoField = new JTextArea();
+        JTextArea memoField = new JTextArea();*/
 
         // 見た目
         Font f = new Font("MS ゴシック", Font.BOLD, 20);
@@ -69,23 +75,55 @@ public class App {
         panel.add(memolabel);
         panel.add(memoField);
 
+        
+        //ーー追加ーー
+        JPanel buttunface = new JPanel();//ボタン用パネル
+        //ーー
+        
         JButton saveButton = new JButton("保存");	//保存ボタン
-        panel.add(saveButton);			
+        buttunface.add(saveButton);	//*名称変更		
 
-        frame.add(panel, BorderLayout.CENTER);
+        frame.add(buttunface, BorderLayout.CENTER);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-
+        buttunface.setVisible(true);
+        
+        //----追加したボタン---
+        Button income = new JButton("収入");
+        buttunface.add(income);
+		JButton outcome = new JButton("支出");
+		buttunface.add(outcome);
+		
+		panel.add(new JLabel()); // 左セルを空ける
+		 panel.add(buttunface);//パネルに表示
+		//--------------
+		
         // ① コンソール出力（デバッグ用）
-        saveButton.addActionListener(e -> {
-            System.out.println("保存をしました！");
-            System.out.println(dateField.getText().trim());
-            System.out.println(categoryField.getText().trim());
-            System.out.println(priceField.getText().trim());
-            System.out.println(memoField.getText().trim());
-        });
-
+		 saveButton.addActionListener(e -> {
+	            System.out.println("保存をしました！");
+	            System.out.println(dateField.getText().trim());
+	            System.out.println(categoryField.getText().trim());
+	            System.out.println(priceField.getText().trim());
+	            System.out.println(memoField.getText().trim());
+	        });
+	        
+	        income.addActionListener(e -> {
+			    System.out.println("収入に追加");
+			   System.out.println (dateField.getText().trim());
+			    System.out.println(categoryField.getText().trim());
+			    System.out.println(priceField.getText().trim());
+			    System.out.println(memoField.getText().trim());
+			    
+			});
+			outcome.addActionListener(e -> {
+			    System.out.println("支出に追加");
+			   System.out.println (dateField.getText().trim());
+			    System.out.println(categoryField.getText().trim());
+			    System.out.println(priceField.getText().trim());
+			    System.out.println(memoField.getText().trim());
+			    
+			    
         // ② JSON 保存
         saveButton.addActionListener(e -> {
             try {
@@ -135,5 +173,7 @@ public class App {
                         "エラー", JOptionPane.ERROR_MESSAGE);
             }
         });
-    }
+
+        frame.pack();
+		}
 }
