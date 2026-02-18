@@ -14,7 +14,7 @@ public class App {
             JsonElement jsonElement = JsonParser.parseReader(reader);
             JsonObject jsonObject = jsonElement.getAsJsonObject();
 
-            // JSONデータのフィールドを取得!!!!!確認
+            // JSONデータのフィールドを取得!!!!!確認する
             String name = jsonObject.get("name").getAsString();
             int age = jsonObject.get("age").getAsInt();
 
