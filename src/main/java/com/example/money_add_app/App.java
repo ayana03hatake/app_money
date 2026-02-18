@@ -10,7 +10,7 @@ import com.google.gson.JsonParser;
 public class App {
     public static void main(String[] args) {
         try (FileReader reader = new FileReader("data.json")) {
-            // JSONファイルをパースしてJsonObjectに変換
+            
             JsonElement jsonElement = JsonParser.parseReader(reader);
             JsonObject jsonObject = jsonElement.getAsJsonObject();
 
