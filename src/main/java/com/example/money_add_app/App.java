@@ -7,7 +7,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -29,15 +28,15 @@ import com.google.gson.reflect.TypeToken;
 
 public class App {
 
-	//確認
+
 	private static final Path DATA_PATH = Path.of("householdList.json");
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-	private static final Type LIST_TYPE=new TypeToken<List<Household>>(){}.getType();
+	private static final java.lang.reflect.Type LIST_TYPE=new TypeToken<List<Household>>(){}.getType();
 
 	public static void main(String[] args) {
         JFrame frame = new JFrame("家計簿入力画面");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//閉じるでアプリケーションも終了
-
+	
         JPanel panel = new JPanel(new FlowLayout());
         panel.setBackground(new Color(230, 255, 230));//背景色
 
@@ -49,15 +48,15 @@ public class App {
 
         // 入力欄（ここを _Field に統一）
         
-        JTextField dateField = new JTextField(10);
-		JTextField categoryField = new JTextField(15);
-		JTextField priceField = new JTextField(15);
-		JTextField memoField = new JTextField(20);
+//        JTextField dateField = new JTextField(10);
+//		JTextField categoryField = new JTextField(15);
+//		JTextField priceField = new JTextField(15);
+//		JTextField memoField = new JTextField(20);
          
-       /* JTextArea dateField = new JTextArea();
+        JTextArea dateField = new JTextArea();
         JTextArea categoryField = new JTextArea();
         JTextArea priceField = new JTextArea();
-        JTextArea memoField = new JTextArea();*/
+        JTextArea memoField = new JTextArea();
 
         // 見た目
         Font f = new Font("MS ゴシック", Font.BOLD, 20);
@@ -74,6 +73,8 @@ public class App {
         panel.add(priceField);
         panel.add(memolabel);
         panel.add(memoField);
+        frame.add(panel);
+       
 
         
         //ーー追加ーー
@@ -86,11 +87,10 @@ public class App {
         frame.add(buttunface, BorderLayout.CENTER);
         frame.pack();
         frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-        buttunface.setVisible(true);
+        
         
         //----追加したボタン---
-        Button income = new JButton("収入");
+        JButton income = new JButton("収入");
         buttunface.add(income);
 		JButton outcome = new JButton("支出");
 		buttunface.add(outcome);
@@ -122,7 +122,7 @@ public class App {
 			    System.out.println(categoryField.getText().trim());
 			    System.out.println(priceField.getText().trim());
 			    System.out.println(memoField.getText().trim());
-			    
+			});
 			    
         // ② JSON 保存
         saveButton.addActionListener(e -> {
@@ -175,5 +175,7 @@ public class App {
         });
 
         frame.pack();
-		}
+        frame.setVisible(true);
+        buttunface.setVisible(true);
+	}
 }
