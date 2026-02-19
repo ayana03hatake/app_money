@@ -1,1 +1,68 @@
-[{"date":"2026-02-17","category":"house","price":3000,"memo":"光熱費"},{"date":"2026-02-17","category":"house","price":20000,"memo":"家賃"}]
+[
+  {
+    "date": "2026",
+    "category": "給料",
+    "price": 80000,
+    "memo": "安い！"
+  },
+  {
+    "date": "2020",
+    "category": "家賃",
+    "price": 4000,
+    "memo": "安い"
+  },
+  {
+    "date": "24343",
+    "category": "fdsg",
+    "price": 46564645,
+    "memo": "gfnbfgh"
+  },
+  {
+    "date": "5343",
+    "category": "dfggf",
+    "price": 3543,
+    "memo": "dfgbhdh"
+  },
+  {
+    "date": "2013",
+    "category": "iphoneSE",
+    "price": 100000,
+    "memo": "スマホデビュー"
+  },
+  {
+    "date": "",
+    "category": "",
+    "price": 0,
+    "memo": ""
+  },
+  {
+    "date": "",
+    "category": "",
+    "price": 0,
+    "memo": ""
+  },
+  {
+    "date": "",
+    "category": "",
+    "price": 0,
+    "memo": ""
+  },
+  {
+    "date": "1111",
+    "category": "kkkk",
+    "price": 11111,
+    "memo": "111111"
+  },
+  {
+    "date": "1111",
+    "category": "kkkk",
+    "price": 11111,
+    "memo": "111111"
+  },
+  {
+    "date": "1111",
+    "category": "kkkk",
+    "price": 11111,
+    "memo": "111111"
+  }
+]
