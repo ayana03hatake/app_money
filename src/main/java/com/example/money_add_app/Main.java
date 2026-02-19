@@ -2,7 +2,6 @@ package com.example.money_add_app;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,12 +34,11 @@ public class Main extends JFrame implements ActionListener{
 
         // 入力画面
         InputPanel inputPanel = new InputPanel(this);
-        inputPanel.setBackground(Color.DARK_GRAY);
         
 
         // 一覧画面
         DetailPanel detailPanel = new DetailPanel(this);
-        detailPanel.setBackground(Color.LIGHT_GRAY);
+        
         
       
         // CardLayout用パネル
