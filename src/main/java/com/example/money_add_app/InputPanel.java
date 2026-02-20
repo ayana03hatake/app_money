@@ -36,7 +36,7 @@ public class InputPanel extends JPanel {
     private static final Path DATA_PATH = Path.of("householdList.json");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Type LIST_TYPE = new TypeToken<List<Household>>() {}.getType();
- 
+    private HomePanel homePanel;
     // 日付
     private static final DateTimeFormatter STRICT_YYYY_MM_DD =
             DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT);
@@ -51,7 +51,9 @@ public class InputPanel extends JPanel {
     }
     // ==============================
  
-    public InputPanel(Main frame) {
+    public InputPanel(Main frame, HomePanel homePanel) {
+    	
+    	this.homePanel = homePanel;
  
         GridLayout gridLayout = new GridLayout(5, 2, 10, 10);
         setLayout(gridLayout);
@@ -63,17 +65,19 @@ public class InputPanel extends JPanel {
                 "家賃", "水道", "ガス", "電気", "食費",
                 "稽古", "化粧品", "外食費", "飲料", "娯楽費", "交際費", "趣味"
         };
-        JComboBox<String> categorybox = new JComboBox<>(categorycombo);
+        JComboBox categorybox = new JComboBox<>(categorycombo);
  
+        JLabel categorylabel = new JLabel("カテゴリー");
         JLabel pricelabel = new JLabel("金額");
         JLabel memolabel = new JLabel("メモ");
  
         datelabel.setFont(new Font("MSゴシック", Font.BOLD, 18));
-        categorybox.setFont(new Font("MSゴシック", Font.BOLD, 18));
+        categorylabel.setFont(new Font("MSゴシック", Font.BOLD, 18));
         pricelabel.setFont(new Font("MSゴシック", Font.BOLD, 18));
         memolabel.setFont(new Font("MSゴシック", Font.BOLD, 18));
  
         datelabel.setHorizontalAlignment(JLabel.CENTER);
+        categorylabel.setHorizontalAlignment(JLabel.CENTER);
         pricelabel.setHorizontalAlignment(JLabel.CENTER);
         memolabel.setHorizontalAlignment(JLabel.CENTER);
  
@@ -103,8 +107,8 @@ public class InputPanel extends JPanel {
  
         add(datelabel);
         add(dateField);
+        add(categorylabel);
         add(categorybox);
-        add(categoryField);
         add(pricelabel);
         add(priceField);
         add(memolabel);
@@ -197,15 +201,17 @@ public class InputPanel extends JPanel {
                     GSON.toJson(list, LIST_TYPE, writer);
                 }
  
-                JOptionPane.showMessageDialog(frame, "JSONへ保存しました！\n" + DATA_PATH.toAbsolutePath());
+                JOptionPane.showMessageDialog(frame, "収入として保存しました！\n" + DATA_PATH.toAbsolutePath());
  
+                homePanel.loadData();//HomePanelに入力されたデータを渡すために追加（相川）
+                
             } catch (NumberFormatException nfe) {
                 JOptionPane.showMessageDialog(frame, "金額は数値で入力してください。",
                         "入力エラー", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(frame,
-                        "保存に失敗しました: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(),
+                        "収入の保存に失敗しました: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(),
                         "エラー", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -273,15 +279,17 @@ public class InputPanel extends JPanel {
                     GSON.toJson(list, LIST_TYPE, writer);
                 }
  
-                JOptionPane.showMessageDialog(frame, "JSONへ保存しました！\n" + DATA_PATH.toAbsolutePath());
+                JOptionPane.showMessageDialog(frame, "支出として保存しました！\n" + DATA_PATH.toAbsolutePath());
  
+                homePanel.loadData();//HomePanelに入力されたデータを渡すために追加（相川）
+                
             } catch (NumberFormatException nfe) {
                 JOptionPane.showMessageDialog(frame, "金額は数値で入力してください。",
                         "入力エラー", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(frame,
-                        "保存に失敗しました: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(),
+                        "逸出の保存に失敗しました: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(),
                         "エラー", JOptionPane.ERROR_MESSAGE);
             }
         });
