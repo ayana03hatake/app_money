@@ -1,88 +1,25 @@
 [
   {
-    "date": "2026",
+    "date": "2026-04-13",
     "category": "給料",
     "price": 80000
   },
   {
-    "date": "2020",
-    "category": "家賃",
-    "price": 4000
+    "date": "2025-05-16",
+    "category": "food",
+    "price": -800,
+    "memo": "昼ごはん"
   },
   {
-    "date": "24343",
-    "category": "fdsg",
-    "price": 46564645
+    "date": "2020-10-18",
+    "category": "food",
+    "price": 1000,
+    "memo": "夜ごはん"
   },
   {
-    "date": "5343",
-    "category": "dfggf",
-    "price": 3543
-  },
-  {
-    "date": "2013",
-    "category": "iphoneSE",
-    "price": 100000
-  },
-  {
-    "date": "",
+    "date": "2020-04-22",
     "category": "",
-    "price": 0
-  },
-  {
-    "date": "",
-    "category": "",
-    "price": 0
-  },
-  {
-    "date": "",
-    "category": "",
-    "price": 0
-  },
-  {
-    "date": "1111",
-    "category": "kkkk",
-    "price": 11111
-  },
-  {
-    "date": "1111",
-    "category": "kkkk",
-    "price": 11111
-  },
-  {
-    "date": "1111",
-    "category": "kkkk",
-    "price": 11111
-  },
-  {
-    "date": "2020",
-    "category": "車",
-    "price": 300000
-  },
-  {
-    "date": "2016",
-    "category": "パソコン",
-    "price": 6000
-  },
-  {
-    "date": "2023",
-    "category": "おやつ",
-    "price": 200
-  },
-  {
-    "date": "2023",
-    "category": "レッドブル",
-    "price": 200
-  },
-  {
-    "date": "2020",
-    "category": "aaa",
-    "price": 800
-  },
-  {
-    "date": "aaa",
-    "category": "aaa",
-    "price": 123,
-    "memo": "aaa"
+    "price": -6000,
+    "memo": "ガス代"
   }
 ]
