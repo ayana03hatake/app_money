@@ -21,5 +21,29 @@
     "category": "",
     "price": -6000,
     "memo": "ガス代"
+  },
+  {
+    "date": "2020-10-30",
+    "category": "",
+    "price": -5000,
+    "memo": "デート"
+  },
+  {
+    "date": "2025-05-05",
+    "category": "",
+    "price": -12000,
+    "memo": "USJ"
+  },
+  {
+    "date": "2020-05-05",
+    "category": "食費",
+    "price": -5000,
+    "memo": "デート"
+  },
+  {
+    "date": "2022-12-12",
+    "category": "家賃",
+    "price": -888888,
+    "memo": ""
   }
 ]

@@ -13,278 +13,277 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.text.MaskFormatter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 public class InputPanel extends JPanel {
-	private static final Path DATA_PATH = Path.of("householdList.json");
-	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-	private static final Type LIST_TYPE = new TypeToken<List<Household>>() {
-	}.getType();
+    private static final Path DATA_PATH = Path.of("householdList.json");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Type LIST_TYPE = new TypeToken<List<Household>>() {}.getType();
 
-	public InputPanel(Main frame) {
+    // 日付
+    private static final DateTimeFormatter STRICT_YYYY_MM_DD =
+            DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT);
 
-		GridLayout gridLayout = new GridLayout(5, 2, 10, 10);
-		setLayout(gridLayout);
-		setBackground(new Color(230, 255, 230));//背景色
+    private static boolean isValidYyyyMmDd(String s) {
+        try {
+            LocalDate.parse(s, STRICT_YYYY_MM_DD);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+    // ==============================
 
-		JLabel datelabel = new JLabel("日付");
+    public InputPanel(Main frame) {
 
-		String[] categorycombo = { "家賃", "水道", "ガス", "電気", "食費",
-				"稽古", "化粧品", "外食費", "飲料", "娯楽費", "交際費", "趣味" };
-		JComboBox categorybox = new JComboBox(categorycombo);
+        GridLayout gridLayout = new GridLayout(5, 2, 10, 10);
+        setLayout(gridLayout);
+        setBackground(new Color(230, 255, 230)); // 背景色
 
-		//JLabel categorylabel = new JLabel("カテゴリー");
-		JLabel pricelabel = new JLabel("金額");
-		JLabel memolabel = new JLabel("メモ");
+        JLabel datelabel = new JLabel("日付");
 
-		datelabel.setFont(new Font("MSゴシック", Font.BOLD, 18));
-		categorybox.setFont(new Font("MSゴシック", Font.BOLD, 18));
-		pricelabel.setFont(new Font("MSゴシック", Font.BOLD, 18));
-		memolabel.setFont(new Font("MSゴシック", Font.BOLD, 18));
+        String[] categorycombo = {
+                "家賃", "水道", "ガス", "電気", "食費",
+                "稽古", "化粧品", "外食費", "飲料", "娯楽費", "交際費", "趣味"
+        };
+        JComboBox<String> categorybox = new JComboBox<>(categorycombo);
 
-		datelabel.setHorizontalAlignment(JLabel.CENTER);
-		//categorybox.setHorizontalAlignment(JLabel.CENTER);
-		pricelabel.setHorizontalAlignment(JLabel.CENTER);
-		memolabel.setHorizontalAlignment(JLabel.CENTER);
+        JLabel pricelabel = new JLabel("金額");
+        JLabel memolabel = new JLabel("メモ");
 
-		// 入力欄（ここを _Field に統一）
+        datelabel.setFont(new Font("MSゴシック", Font.BOLD, 18));
+        categorybox.setFont(new Font("MSゴシック", Font.BOLD, 18));
+        pricelabel.setFont(new Font("MSゴシック", Font.BOLD, 18));
+        memolabel.setFont(new Font("MSゴシック", Font.BOLD, 18));
 
-		JTextField dateField = new JTextField(10);
-		JTextField categoryField = new JTextField(15);
-		JTextField priceField = new JTextField(15);
-		JTextField memoField = new JTextField(20);
+        datelabel.setHorizontalAlignment(JLabel.CENTER);
+        pricelabel.setHorizontalAlignment(JLabel.CENTER);
+        memolabel.setHorizontalAlignment(JLabel.CENTER);
 
-		// 見た目
-		Font f = new Font("MS ゴシック", Font.BOLD, 20);
-		for (JTextField ta : new JTextField[] { dateField, categoryField, priceField, memoField }) { //配列（dateField / categoryField / priceField / memoField）
-			ta.setPreferredSize(new Dimension(150, 30)); //入力欄 の　箱の設定一括で設定
-			ta.setFont(f);
-		}
+        //  date は JFormattedTextField（数字＋ハイフン固定） 
+        JFormattedTextField dateField;
+        try {
+            MaskFormatter mf = new MaskFormatter("####-##-##"); // yyyy-MM-dd 形式
+            mf.setPlaceholderCharacter('_');                    // 入力フォーマット
+            dateField = new JFormattedTextField(mf);
+            dateField.setColumns(10);
+        } catch (java.text.ParseException pe) {
+            throw new RuntimeException(pe);
+        }
+        // =====================================================
 
-		add(datelabel);
-		add(dateField);
-		add(categorybox);
-		add(categoryField);
-		add(pricelabel);
-		add(priceField);
-		add(memolabel);
-		add(memoField);
+        // 任意入力の独自カテゴリ。空の場合はコンボ選択を使う
+        JTextField categoryField = new JTextField(15);
+        JTextField priceField = new JTextField(15);
+        JTextField memoField = new JTextField(20);
 
-		//ーー追加ーー
-		JPanel buttunface = new JPanel();//ボタン用パネル
-		buttunface.setBackground(new Color(230, 255, 230));
-		//ーー
+        // 見た目
+        Font f = new Font("MS ゴシック", Font.BOLD, 20);
+        for (JTextField ta : new JTextField[] { dateField, categoryField, priceField, memoField }) {
+            ta.setPreferredSize(new Dimension(150, 30));
+            ta.setFont(f);
+        }
 
-		JButton categoryButton = new JButton("カテゴリーを追加"); //ポップアップ？
-		buttunface.add(categoryButton); //*名称変更		
+        add(datelabel);
+        add(dateField);
+        add(categorybox);
+        add(categoryField);
+        add(pricelabel);
+        add(priceField);
+        add(memolabel);
+        add(memoField);
 
-		//		frame.add(panel);
-		//----追加したボタン---
-		JButton income = new JButton("収入として登録");
-		buttunface.add(income);
-		JButton outcome = new JButton("支出として登録");
-		buttunface.add(outcome);
+        // ボタン用パネル
+        JPanel buttunface = new JPanel();
+        buttunface.setBackground(new Color(230, 255, 230));
 
-		frame.setLocationRelativeTo(null);//中央揃え
-		frame.setSize(1000, 800);
-		frame.add(buttunface, BorderLayout.SOUTH);
-		add(buttunface);
-		add(new JLabel()); // 左セルを空ける
-		add(buttunface);//パネルに表示
-		frame.setVisible(true);
-		setVisible(true);
-		buttunface.setVisible(true);
-		frame.pack();
-		//--------------
+        JButton categoryButton = new JButton("カテゴリーを追加"); // （動作は未実装）
+        JButton income = new JButton("収入として登録");
+        JButton outcome = new JButton("支出として登録");
 
-		// ① コンソール出力（デバッグ用）
-		//		saveButton.addActionListener(e -> {
-		//			System.out.println("保存をしました！");
-		//			System.out.println(dateField.getText().trim());
-		//			System.out.println(categoryField.getText().trim());
-		//			System.out.println(priceField.getText().trim());
-		//			System.out.println(memoField.getText().trim());
-		//		});
+        buttunface.add(categoryButton);
+        buttunface.add(income);
+        buttunface.add(outcome);
 
-		income.addActionListener(e -> {
-			System.out.println("収入に登録しました！");
-			System.out.println(dateField.getText().trim());
-			System.out.println(categoryField.getText().trim());
-			System.out.println(priceField.getText().trim());
-			System.out.println(memoField.getText().trim());
+        frame.setLocationRelativeTo(null); // 中央揃え
+        frame.setSize(1000, 800);
+        frame.add(buttunface, BorderLayout.SOUTH);
+        add(buttunface);
+        add(new JLabel()); // 左セルを空ける
+        add(buttunface);   // パネルに表示
+        frame.setVisible(true);
+        setVisible(true);
+        buttunface.setVisible(true);
+        frame.pack();
 
-		});
-		outcome.addActionListener(e -> {
-			System.out.println("支出に登録しました！");
-			System.out.println(dateField.getText().trim());
-			System.out.println(categoryField.getText().trim());
-			System.out.println(priceField.getText().trim());
-			System.out.println(memoField.getText().trim());
-		});
+        // 収入：最初に日付チェック → 保存 
+        income.addActionListener(e -> {
+            try {
+                String date = dateField.getText().trim();
 
-		// ② JSON 保存
-		//		saveButton.addActionListener(e -> {
-		//			try {
-		//				String date = dateField.getText().trim();
-		//				String category = categoryField.getText().trim();
-		//				String priceText = priceField.getText().trim();
-		//				String memo = memoField.getText().trim();
-		//
-		//				BigDecimal price = priceText.isEmpty() ? BigDecimal.ZERO : new BigDecimal(priceText);
-		//
-		//				Household item = new Household(date, category, price, memo);
-		//
-		//				// 既存の JSON を読み込み（なければ空）
-		//				List<Household> list = new ArrayList<>();
-		//				if (Files.exists(DATA_PATH)) {
-		//					try (BufferedReader reader = Files.newBufferedReader(DATA_PATH, StandardCharsets.UTF_8)) {
-		//						List<Household> loaded = GSON.fromJson(reader, LIST_TYPE);
-		//						if (loaded != null)
-		//							list = loaded;
-		//					}
-		//				}
-		//
-		//				// 追加
-		//				list.add(item);
-		//
-		//				// 親フォルダがあれば作成
-		//				Path parent = DATA_PATH.getParent();
-		//				if (parent != null) {
-		//					Files.createDirectories(parent);
-		//				}
-		//
-		//				// 上書き保存（安全）
-		//				try (BufferedWriter writer = Files.newBufferedWriter(
-		//						DATA_PATH, StandardCharsets.UTF_8,
-		//						StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
-		//					GSON.toJson(list, LIST_TYPE, writer);
-		//				}
-		//
-		//				JOptionPane.showMessageDialog(frame, "JSONへ保存しました！\n" + DATA_PATH.toAbsolutePath());
-		//
-		//			} catch (NumberFormatException nfe) {
-		//				JOptionPane.showMessageDialog(frame, "金額は数値で入力してください。",
-		//						"入力エラー", JOptionPane.ERROR_MESSAGE);
-		//			} catch (Exception ex) {
-		//				ex.printStackTrace();
-		//				JOptionPane.showMessageDialog(frame,
-		//						"保存に失敗しました: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(),
-		//						"エラー", JOptionPane.ERROR_MESSAGE);
-		//			}
-		//		});
+                // ★最初に：形式＋実在チェック（NGなら中断）
+                if (!date.matches("\\d{4}-\\d{2}-\\d{2}") || !isValidYyyyMmDd(date)) {
+                    JOptionPane.showMessageDialog(frame,
+                            "日付は yyyy-MM-dd 形式かつ実在する日付で入力してください。",
+                            "入力エラー", JOptionPane.ERROR_MESSAGE);
+                    dateField.requestFocus();
+                    return;
+                }
 
-		income.addActionListener(e -> {
-			try {
-				String date = dateField.getText().trim();
-				String category = categoryField.getText().trim();
-				String priceText = priceField.getText().trim();
-				String memo = memoField.getText().trim();
+                // カテゴリはテキスト優先。未入力ならコンボの選択を使う
+                String categoryTyped = categoryField.getText().trim();
+                String categorySelected = (String) categorybox.getSelectedItem();
+                String category = categoryTyped.isEmpty() ? categorySelected : categoryTyped;
 
-				BigDecimal price = priceText.isEmpty() ? BigDecimal.ZERO : new BigDecimal(priceText);
+                String priceText = priceField.getText().trim();
+                String memo = memoField.getText().trim();
+                
+		        
+		        if (priceText.isEmpty()) { // 空白チェック
+		            JOptionPane.showMessageDialog(frame, "金額を入力してください。", "入力エラー", JOptionPane.ERROR_MESSAGE);
+		            return;
+		        }
+		        for (int i = 0; i < priceText.length(); i++) { // if 「0以上の整数」チェック 
+		            char c = priceText.charAt(i);
+		            if (c < '0' || c > '9') {
+		                JOptionPane.showMessageDialog(frame, "金額は0以上の整数で入力してください。", "入力エラー", JOptionPane.ERROR_MESSAGE);
+		                return;
+		            }
+		        }
+                // 金額
+                BigDecimal price = priceText.isEmpty() ? BigDecimal.ZERO : new BigDecimal(priceText);
 
-				Household item = new Household(date, category, price, memo);
+                Household item = new Household(date, category, price, memo);
 
-				// 既存の JSON を読み込み（なければ空）
-				List<Household> list = new ArrayList<>();
-				if (Files.exists(DATA_PATH)) {
-					try (BufferedReader reader = Files.newBufferedReader(DATA_PATH, StandardCharsets.UTF_8)) {
-						List<Household> loaded = GSON.fromJson(reader, LIST_TYPE);
-						if (loaded != null)
-							list = loaded;
-					}
-				}
+                // 既存読み込み
+                List<Household> list = new ArrayList<>();
+                if (Files.exists(DATA_PATH)) {
+                    try (BufferedReader reader = Files.newBufferedReader(DATA_PATH, StandardCharsets.UTF_8)) {
+                        List<Household> loaded = GSON.fromJson(reader, LIST_TYPE);
+                        if (loaded != null) list = loaded;
+                    }
+                }
 
-				// 追加
-				list.add(item);
+                // 追加
+                list.add(item);
 
-				// 親フォルダがあれば作成
-				Path parent = DATA_PATH.getParent();
-				if (parent != null) {
-					Files.createDirectories(parent);
-				}
+                // 親フォルダ
+                Path parent = DATA_PATH.getParent();
+                if (parent != null) {
+                    Files.createDirectories(parent);
+                }
 
-				// 上書き保存（安全）
-				try (BufferedWriter writer = Files.newBufferedWriter(
-						DATA_PATH, StandardCharsets.UTF_8,
-						StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
-					GSON.toJson(list, LIST_TYPE, writer);
-				}
+                // 保存
+                try (BufferedWriter writer = Files.newBufferedWriter(
+                        DATA_PATH, StandardCharsets.UTF_8,
+                        StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+                    GSON.toJson(list, LIST_TYPE, writer);
+                }
 
-				JOptionPane.showMessageDialog(frame, "JSONへ保存しました！\n" + DATA_PATH.toAbsolutePath());
+                JOptionPane.showMessageDialog(frame, "JSONへ保存しました！\n" + DATA_PATH.toAbsolutePath());
 
-			} catch (NumberFormatException nfe) {
-				JOptionPane.showMessageDialog(frame, "金額は数値で入力してください。",
-						"入力エラー", JOptionPane.ERROR_MESSAGE);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				JOptionPane.showMessageDialog(frame,
-						"保存に失敗しました: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(),
-						"エラー", JOptionPane.ERROR_MESSAGE);
-			}
-		});
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(frame, "金額は数値で入力してください。",
+                        "入力エラー", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(frame,
+                        "保存に失敗しました: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(),
+                        "エラー", JOptionPane.ERROR_MESSAGE);
+            }
+        });
 
-		outcome.addActionListener(e -> {
-			try {
-				String date = dateField.getText().trim();
-				String category = categoryField.getText().trim();
-				String priceText = priceField.getText().trim();
-				String memo = memoField.getText().trim();
+        //  支出：最初に日付チェック → 金額をマイナスにして保存 
+        outcome.addActionListener(e -> {
+            try {
+                String date = dateField.getText().trim();
 
-				BigDecimal price = priceText.isEmpty() ? BigDecimal.ZERO : new BigDecimal(priceText);
-				BigDecimal expense = price.multiply(BigDecimal.valueOf(-1));// 支出はマイナスにする（ここがポイント）
+                // ★最初に：形式＋実在チェック（NGなら中断）
+                if (!date.matches("\\d{4}-\\d{2}-\\d{2}") || !isValidYyyyMmDd(date)) {
+                    JOptionPane.showMessageDialog(frame,
+                            "日付は yyyy-MM-dd 形式かつ実在する日付で入力してください。",
+                            "入力エラー", JOptionPane.ERROR_MESSAGE);
+                    dateField.requestFocus();
+                    return;
+                }
 
-				Household item = new Household(date, category, expense, memo);
+                String categoryTyped = categoryField.getText().trim();
+                String categorySelected = (String) categorybox.getSelectedItem();
+                String category = categoryTyped.isEmpty() ? categorySelected : categoryTyped;
 
-				// 既存の JSON を読み込み（なければ空）
-				List<Household> list = new ArrayList<>();
-				if (Files.exists(DATA_PATH)) {
-					try (BufferedReader reader = Files.newBufferedReader(DATA_PATH, StandardCharsets.UTF_8)) {
-						List<Household> loaded = GSON.fromJson(reader, LIST_TYPE);
-						if (loaded != null)
-							list = loaded;
-					}
-				}
+                String priceText = priceField.getText().trim();
+                String memo = memoField.getText().trim();
 
-				// 追加
-				list.add(item);
+                if (priceText.isEmpty()) {//空白チェック
+		            JOptionPane.showMessageDialog(frame, "金額を入力してください。", "入力エラー", JOptionPane.ERROR_MESSAGE);
+		            return;
+		        }
+		        for (int i = 0; i < priceText.length(); i++) {
+		            char c = priceText.charAt(i);
+		            if (c < '0' || c > '9') {
+		                JOptionPane.showMessageDialog(frame, "金額は0以上の整数で入力してください。", "入力エラー", JOptionPane.ERROR_MESSAGE);
+		                return;
+		            }
+		        }
+		        
+                BigDecimal price = priceText.isEmpty() ? BigDecimal.ZERO : new BigDecimal(priceText);
+                BigDecimal expense = price.multiply(BigDecimal.valueOf(-1)); // 支出はマイナス
 
-				// 親フォルダがあれば作成
-				Path parent = DATA_PATH.getParent();
-				if (parent != null) {
-					Files.createDirectories(parent);
-				}
+                Household item = new Household(date, category, expense, memo);
 
-				// 上書き保存（安全）
-				try (BufferedWriter writer = Files.newBufferedWriter(
-						DATA_PATH, StandardCharsets.UTF_8,
-						StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
-					GSON.toJson(list, LIST_TYPE, writer);
-				}
+                // 既存読み込み
+                List<Household> list = new ArrayList<>();
+                if (Files.exists(DATA_PATH)) {
+                    try (BufferedReader reader = Files.newBufferedReader(DATA_PATH, StandardCharsets.UTF_8)) {
+                        List<Household> loaded = GSON.fromJson(reader, LIST_TYPE);
+                        if (loaded != null) list = loaded;
+                    }
+                }
 
-				JOptionPane.showMessageDialog(frame, "JSONへ保存しました！\n" + DATA_PATH.toAbsolutePath());
+                // 追加
+                list.add(item);
 
-			} catch (NumberFormatException nfe) {
-				JOptionPane.showMessageDialog(frame, "金額は数値で入力してください。",
-						"入力エラー", JOptionPane.ERROR_MESSAGE);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				JOptionPane.showMessageDialog(frame,
-						"保存に失敗しました: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(),
-						"エラー", JOptionPane.ERROR_MESSAGE);
-			}
-		});
-	}
+                // 親フォルダ
+                Path parent = DATA_PATH.getParent();
+                if (parent != null) {
+                    Files.createDirectories(parent);
+                }
 
+                // 保存
+                try (BufferedWriter writer = Files.newBufferedWriter(
+                        DATA_PATH, StandardCharsets.UTF_8,
+                        StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+                    GSON.toJson(list, LIST_TYPE, writer);
+                }
+
+                JOptionPane.showMessageDialog(frame, "JSONへ保存しました！\n" + DATA_PATH.toAbsolutePath());
+
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(frame, "金額は数値で入力してください。",
+                        "入力エラー", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(frame,
+                        "保存に失敗しました: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(),
+                        "エラー", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+    }
 }
