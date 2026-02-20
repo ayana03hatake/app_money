@@ -48,7 +48,7 @@ public class DetailPanel extends JPanel {
 
 		//arraylist
 
-//		 既存の JSON を読み込み（なければ空）
+//		 既存の JSON を読み込み
 				List<Household> list = new ArrayList<>();
 				if (Files.exists(DATA_PATH)) {
 					try (BufferedReader reader = Files.newBufferedReader(DATA_PATH, StandardCharsets.UTF_8)) {
