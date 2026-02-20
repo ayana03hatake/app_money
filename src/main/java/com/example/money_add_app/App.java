@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -107,7 +108,7 @@ public class App {
 		buttunface.add(outcome);
 
 		frame.setLocationRelativeTo(null);//中央揃え
-		frame.setSize(1000, 800);
+		frame.setSize(900, 600);
 		frame.add(buttunface, BorderLayout.SOUTH);
 		panel.add(buttunface);
 		panel.add(new JLabel()); // 左セルを空ける
