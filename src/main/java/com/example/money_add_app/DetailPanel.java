@@ -15,6 +15,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class DetailPanel extends JPanel {
 	public DetailPanel(Main frame) {
+		
 		//		int currentYear = Year.now().getValue();
 		//		Integer[] years = new Integer[51];
 		//		for (int i = 0; i <= 50; i++) {
