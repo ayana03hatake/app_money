@@ -243,8 +243,9 @@ public class InputPanel extends JPanel {
 				String memo = memoField.getText().trim();
 
 				BigDecimal price = priceText.isEmpty() ? BigDecimal.ZERO : new BigDecimal(priceText);
+				BigDecimal expense = price.multiply(BigDecimal.valueOf(-1));// 支出はマイナスにする（ここがポイント）
 
-				Household item = new Household(date, category, price, memo);
+				Household item = new Household(date, category, expense, memo);
 
 				// 既存の JSON を読み込み（なければ空）
 				List<Household> list = new ArrayList<>();
