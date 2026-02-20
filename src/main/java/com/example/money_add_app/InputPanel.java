@@ -37,7 +37,7 @@ public class InputPanel extends JPanel {
 
 		GridLayout gridLayout = new GridLayout(5, 2, 10, 10);
 		setLayout(gridLayout);
-		setBackground(new Color(230, 255, 230));//背景色
+		setBackground(new Color(175, 223, 228));//背景色
 
 		JLabel datelabel = new JLabel("日付");
 
@@ -45,17 +45,17 @@ public class InputPanel extends JPanel {
 				"稽古", "化粧品", "外食費", "飲料", "娯楽費", "交際費", "趣味" };
 		JComboBox categorybox = new JComboBox(categorycombo);
 
-		//JLabel categorylabel = new JLabel("カテゴリー");
+		JLabel categorylabel = new JLabel("カテゴリー");
 		JLabel pricelabel = new JLabel("金額");
 		JLabel memolabel = new JLabel("メモ");
 
 		datelabel.setFont(new Font("MSゴシック", Font.BOLD, 18));
-		categorybox.setFont(new Font("MSゴシック", Font.BOLD, 18));
+		categorylabel.setFont(new Font("MSゴシック", Font.BOLD, 18));
 		pricelabel.setFont(new Font("MSゴシック", Font.BOLD, 18));
 		memolabel.setFont(new Font("MSゴシック", Font.BOLD, 18));
 
 		datelabel.setHorizontalAlignment(JLabel.CENTER);
-		//categorybox.setHorizontalAlignment(JLabel.CENTER);
+		categorylabel.setHorizontalAlignment(JLabel.CENTER);
 		pricelabel.setHorizontalAlignment(JLabel.CENTER);
 		memolabel.setHorizontalAlignment(JLabel.CENTER);
 
@@ -75,8 +75,8 @@ public class InputPanel extends JPanel {
 
 		add(datelabel);
 		add(dateField);
+		add(categorylabel);
 		add(categorybox);
-		add(categoryField);
 		add(pricelabel);
 		add(priceField);
 		add(memolabel);
@@ -84,7 +84,7 @@ public class InputPanel extends JPanel {
 
 		//ーー追加ーー
 		JPanel buttunface = new JPanel();//ボタン用パネル
-		buttunface.setBackground(new Color(230, 255, 230));
+		buttunface.setBackground(new Color(175, 223, 228));
 		//ーー
 
 		JButton categoryButton = new JButton("カテゴリーを追加"); //ポップアップ？
@@ -222,7 +222,7 @@ public class InputPanel extends JPanel {
 					GSON.toJson(list, LIST_TYPE, writer);
 				}
 
-				JOptionPane.showMessageDialog(frame, "JSONへ保存しました！\n" + DATA_PATH.toAbsolutePath());
+				JOptionPane.showMessageDialog(frame, "支出へ保存しました！\n" + DATA_PATH.toAbsolutePath());
 
 			} catch (NumberFormatException nfe) {
 				JOptionPane.showMessageDialog(frame, "金額は数値で入力してください。",
@@ -273,7 +273,7 @@ public class InputPanel extends JPanel {
 					GSON.toJson(list, LIST_TYPE, writer);
 				}
 
-				JOptionPane.showMessageDialog(frame, "JSONへ保存しました！\n" + DATA_PATH.toAbsolutePath());
+				JOptionPane.showMessageDialog(frame, "収入へ保存しました！\n" + DATA_PATH.toAbsolutePath());
 
 			} catch (NumberFormatException nfe) {
 				JOptionPane.showMessageDialog(frame, "金額は数値で入力してください。",
