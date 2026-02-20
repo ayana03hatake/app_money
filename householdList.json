@@ -15,5 +15,11 @@
     "category": "food",
     "price": 1000,
     "memo": "夜ごはん"
+  },
+  {
+    "date": "2020-04-22",
+    "category": "",
+    "price": -6000,
+    "memo": "ガス代"
   }
 ]
