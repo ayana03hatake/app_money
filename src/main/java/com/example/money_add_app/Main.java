@@ -33,7 +33,7 @@ public class Main extends JFrame implements ActionListener{
         
 
         // 入力画面
-        InputPanel inputPanel = new InputPanel(this);
+        InputPanel inputPanel = new InputPanel(this,homePanel);
         
 
         // 一覧画面
