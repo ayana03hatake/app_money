@@ -15,7 +15,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class DetailPanel extends JPanel {
 	public DetailPanel(Main frame) {
-		
+		// チェック!
 		//		int currentYear = Year.now().getValue();
 		//		Integer[] years = new Integer[51];
 		//		for (int i = 0; i <= 50; i++) {
@@ -73,7 +73,7 @@ public class DetailPanel extends JPanel {
 
 		JPanel tablepanel = new JPanel();//テーブル用パネル
 		tablepanel.setPreferredSize(new Dimension(700, 500));
-		tablepanel.setBackground(new Color(230, 255, 230));//背景色
+		tablepanel.setBackground(new Color(169, 206, 236));//背景色
 
 		JScrollPane scpane = new JScrollPane(table);
 		scpane.setPreferredSize(new Dimension(650, 450));
