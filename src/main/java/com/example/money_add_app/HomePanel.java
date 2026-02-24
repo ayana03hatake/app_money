@@ -1,9 +1,13 @@
 package com.example.money_add_app;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.io.FileReader;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +29,9 @@ public class HomePanel extends JPanel{
 	
 	private JLabel label;
 	private JComboBox<String> monthBox;
+	private BarChartPanel chartPanel;
+	private JPanel centerPanel;
+	private boolean firstView = true;
 	
 	private Map<String, Integer> incomeMap = new HashMap<>();
 	private Map<String, Integer> expenseMap = new HashMap<>();
@@ -37,16 +44,51 @@ public class HomePanel extends JPanel{
 		JButton btn01 = new JButton("Home画面");
 		add(btn01, BorderLayout.NORTH);
 		
+		//ラベル作成
 		label = new JLabel("",SwingConstants.CENTER);
 		label.setFont(new java.awt.Font("メイリオ", java.awt.Font.BOLD,20));
+		
 		add(label, BorderLayout.CENTER);
 		
 		monthBox = new JComboBox<>();
+		
 		add(monthBox, BorderLayout.SOUTH);
 		
-		monthBox.addActionListener(e -> updateLabel());
+		chartPanel = new BarChartPanel();
+		chartPanel.setPreferredSize(new Dimension(400, 300));
 		
+		//データ読込
 		loadData();
+		
+		//月選択時
+		monthBox.addActionListener(e -> {
+			
+			//初回のみレイアウト切り替え
+			if(firstView) {
+				switchToSplitLayout();
+				firstView = false;
+			}
+			
+			updateLabel();
+			updateGraph();
+		});
+	}
+	
+	//レイアウト切り替え用
+	private void switchToSplitLayout() {
+		
+		remove(label);
+		
+		//中央パネル作成
+		centerPanel = new JPanel(new BorderLayout());
+		centerPanel.add(label, BorderLayout.CENTER);
+		centerPanel.add(monthBox, BorderLayout.SOUTH);
+		
+		add(centerPanel, BorderLayout.CENTER);
+		add(chartPanel, BorderLayout.EAST);
+		
+		revalidate();
+		repaint();
 	}
 	
 	//再読み込み
@@ -94,6 +136,7 @@ public class HomePanel extends JPanel{
 		}
 	}
 	
+	//ラベルの更新
 	private void updateLabel() {
 		
 		if(label == null)return;
@@ -113,6 +156,36 @@ public class HomePanel extends JPanel{
 				+ "</center></html>");
 	}
 	
+	//棒グラフの更新
+	private void updateGraph() {
+		String selectedMonth = (String)monthBox.getSelectedItem();
+		if(selectedMonth == null) return;
+		
+		//年と月を分割
+		String[] parts = selectedMonth.split("-");
+		int year = Integer.parseInt(parts[0]);
+		int month = Integer.parseInt(parts[1]);
+		
+		String[] labels = new String[3];
+		int[] values = new int[3];
+		
+		//表示年月洗い出し
+		for(int i = 0; i < 3; i++) {
+			int m = month - i;
+			int y = year;
+			if(m <= 0) {
+				m += 12;
+				y -= 1;
+			}
+			String key = String.format("%04d-%02d", y,m);
+			labels[2 - i] = key;//左から古い順
+			values[2 - i] = balanceMap.getOrDefault(key, 0);
+		}
+		
+		chartPanel.setData(labels, values);
+		chartPanel.repaint();
+	}
+	
 	//データクラス
 	public static class Jsondata{
 		
@@ -128,6 +201,69 @@ public class HomePanel extends JPanel{
 		}
 		public int getPrice() {
 			return price;
+		}
+	}
+	
+	//棒グラフ書く用
+	private static class BarChartPanel extends JPanel{
+		private String[] labels = new String[0];
+		private int[] values = new int[0];
+		
+		public void setData(String[] labels, int[] values) {
+			this.labels = labels;
+			this.values = values;
+		}
+		
+		@Override
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			if(labels.length == 0) return;
+			
+			int w = getWidth();
+			int h = getHeight();
+			int margin = 40;
+			int barWidth = (w - margin * 2) / labels.length - 20;
+			
+			//最大値計算
+			int max = Arrays.stream(values).max().orElse(1);
+			//最小値
+			int min = Arrays.stream(values).min().orElse(0);
+			
+			//最大振れ幅
+			int absMax = Math.max(Math.abs(max), Math.abs(min));
+			
+			//基準0を中央へ
+			int zeroY = h / 2;
+			
+			//0ライン
+			g.setColor(Color.GRAY);
+			g.drawLine(margin, zeroY, w - margin, zeroY);
+			
+			for(int i = 0; i < labels.length; i++) {
+				
+				int barHeight = (int)((double)Math.abs(values[i]) / absMax * (h / 2 - margin));
+				
+				int x = margin + i * (barWidth + 20);
+				
+				if(values[i] >= 0) {
+					//プラスを上に伸ばす
+					g.setColor(Color.BLUE);
+					g.fillRect(x, zeroY - barHeight, barWidth, barHeight);
+					g.setColor(Color.BLACK);
+					g.drawRect(x, zeroY - barHeight, barWidth, barHeight);
+					g.drawString(String.valueOf(values[i]), x, zeroY - barHeight - 5);
+				}else {
+					//マイナスを下に伸ばす
+					g.setColor(Color.RED);
+					g.fillRect(x, zeroY, barWidth, barHeight);
+					g.setColor(Color.BLACK);
+					g.drawRect(x, zeroY, barWidth, barHeight);
+					g.drawString(String.valueOf(values[i]), x, zeroY + barHeight + 15); 
+				}
+				
+				g.drawString(labels[i], x, h - margin + 15);
+				
+			}
 		}
 	}
 

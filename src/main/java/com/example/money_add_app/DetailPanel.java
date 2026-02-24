@@ -30,20 +30,27 @@ public class DetailPanel extends JPanel {
 	public DetailPanel(Main frame) {
 
 		//-----------検索ボタン-----------------------------------------
-		JPanel buttonPanel = new JPanel(new BorderLayout());
+		JPanel buttonPanel = new JPanel();
 
 		String[] yearList = { "2015年", "2016年", "2017年", "2018年", "2019年",
 				"2020年", "2021年", "2022年", "2023年", "2024年", "2025年", "2026年", "全件取得" };
 		JComboBox yearBox = new JComboBox(yearList);
-		buttonPanel.add(yearBox,BorderLayout.WEST);
+		buttonPanel.add(yearBox);
 
 		String[] monthList = { "01月", "02月", "03月", "04月", "05月", "06月",
 				"07月", "08月", "09月", "10月", "11月", "12月", "全件取得" };
 		JComboBox monthBox = new JComboBox(monthList);
-		buttonPanel.add(monthBox,BorderLayout.CENTER);
+		buttonPanel.add(monthBox);
+		
+		String[] categoryList = {
+                "家賃", "水道", "ガス", "電気", "食費",
+                "稽古", "化粧品", "外食費", "飲料", "娯楽費", "交際費", "趣味", "全件取得"
+        };
+		JComboBox categoryBox = new JComboBox(categoryList);
+		buttonPanel.add(categoryBox);
 
 		JButton searchbtn = new JButton("検索");
-		buttonPanel.add(searchbtn, BorderLayout.EAST);
+		buttonPanel.add(searchbtn);
 		add(buttonPanel, BorderLayout.NORTH);
 
 		
@@ -87,42 +94,48 @@ public class DetailPanel extends JPanel {
 			String selectedYear = String.valueOf(yearBox.getSelectedItem()).replaceAll("[^0-9]", "");
 			String selectedMonth = String.valueOf(monthBox.getSelectedItem()).replaceAll("[^0-9]", "");
 			DefaultTableModel selectedModel = new DefaultTableModel(columnNames, 0);
+			List<Household> selectedHouseholdList = new ArrayList<>();
 
 			for (Household household : clonedList) {
 				String[] splitedDate = household.getDate().split("-", 3);
 
 				if (selectedYear.equals(splitedDate[0]) && selectedMonth.equals(splitedDate[1])) {
-					selectedModel.addRow(new Object[] {
-							household.getDate(),
-							household.getCategory(),
-							household.getPrice(),
-							household.getMemo()
-					});
-
+					selectedHouseholdList.add(household);
 				} else if (yearBox.getSelectedItem().equals("全件取得") && selectedMonth.equals(splitedDate[1])) {
-					selectedModel.addRow(new Object[] {
-							household.getDate(),
-							household.getCategory(),
-							household.getPrice(),
-							household.getMemo()
-					});
+					selectedHouseholdList.add(household);
 				} else if (selectedYear.equals(splitedDate[0]) && monthBox.getSelectedItem().equals("全件取得")) {
-					selectedModel.addRow(new Object[] {
-							household.getDate(),
-							household.getCategory(),
-							household.getPrice(),
-							household.getMemo()
-					});
+					selectedHouseholdList.add(household);
 				} else if (yearBox.getSelectedItem().equals("全件取得") && monthBox.getSelectedItem().equals("全件取得")) {
-					selectedModel.addRow(new Object[] {
-							household.getDate(),
-							household.getCategory(),
-							household.getPrice(),
-							household.getMemo()
-					});
+					selectedHouseholdList.add(household);
 
 				}
 			}
+			for(Household household: selectedHouseholdList) {
+				if(categoryBox.getSelectedItem().equals(household.getCategory())) {
+					selectedModel.addRow(new Object[] {
+							household.getDate(),
+							household.getCategory(),
+							household.getPrice(),
+							household.getMemo()
+					});
+				}else if(categoryBox.getSelectedItem().equals("全件取得")) {
+					selectedModel.addRow(new Object[] {
+							household.getDate(),
+							household.getCategory(),
+							household.getPrice(),
+							household.getMemo()
+					});
+				}
+			}
+			if(selectedModel.getRowCount() == 0) {
+				selectedModel.addRow(new Object[] {
+						"登録した収支はありません"
+				});
+				//JOptionPane.showMessageDialog(scrollPane, "登録した収支はありません");
+			}
+			
+			
+			
 			JTable selectedTable = new JTable(selectedModel);
 			JScrollPane scrollPane1 = new JScrollPane(selectedTable);
 			contentPanel.add(scrollPane1);
