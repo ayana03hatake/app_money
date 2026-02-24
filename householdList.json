@@ -2,30 +2,31 @@
   {
     "date": "2026-04-13",
     "category": "給料",
-    "price": 80000
+    "price": 80000,
+    "memo": "給料"
   },
   {
     "date": "2025-05-16",
-    "category": "food",
+    "category": "食費",
     "price": -800,
     "memo": "昼ごはん"
   },
   {
     "date": "2020-10-18",
-    "category": "food",
-    "price": 1000,
+    "category": "食費",
+    "price": -3000,
     "memo": "夜ごはん"
   },
   {
     "date": "2020-04-22",
-    "category": "",
+    "category": "光熱費",
     "price": -6000,
     "memo": "ガス代"
   },
   {
     "date": "2020-05-14",
-    "category": "水道",
-    "price": 3000,
+    "category": "光熱費",
+    "price": -3000,
     "memo": "水道代"
   },
   {
@@ -39,5 +40,11 @@
     "category": "食費",
     "price": -3000,
     "memo": "夕食"
+  },
+  {
+    "date": "2027-04-10",
+    "category": "給料",
+    "price": 300000,
+    "memo": "給料"
   }
 ]
