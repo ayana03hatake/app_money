@@ -1,8 +1,12 @@
 package com.example.money_add_app;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.math.BigDecimal;
+import java.awt.BorderLayout;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,53 +17,53 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 public class DetailPanel extends JPanel {
+	private static final Path DATA_PATH = Path.of("householdList.json");
+	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	private static final Type LIST_TYPE = new TypeToken<List<Household>>() {
+	}.getType();
+
 	public DetailPanel(Main frame) {
-		// チェック!
-		//		int currentYear = Year.now().getValue();
-		//		Integer[] years = new Integer[51];
-		//		for (int i = 0; i <= 50; i++) {
-		//			years[i] = currentYear - i;
-		//		}
-		//		JComboBox<Integer> yearCombo = new JComboBox<Integer>(years);
-		//		yearCombo.setSelectedIndex(0); // 初期選択を今年に設定
-		//		add(yearCombo);
-		//		String[] months = {
-		//				"1月", "2月", "3月", "4月", "5月", "6月",
-		//				"7月", "8月", "9月", "10月", "11月", "12月"
-		//		};
-		//		JComboBox<String> monthCombo = new JComboBox<String>(months);
-		//		monthCombo.setSelectedIndex(0); // 初期選択を1月に設定
-		//		add(monthCombo);
-		//		JButton btn02 = new JButton("検索");
-		//		add(btn02);
 
-		//arraylist
+		//-----------検索ボタン-----------------------------------------
+		JPanel buttonPanel = new JPanel(new BorderLayout());
 
-		// 既存の JSON を読み込み（なければ空）
-		//		List<Household> list = new ArrayList<>();
-		//		if (Files.exists(DATA_PATH)) {
-		//			try (BufferedReader reader = Files.newBufferedReader(DATA_PATH, StandardCharsets.UTF_8)) {
-		//				List<Household> loaded = GSON.fromJson(reader, LIST_TYPE);
-		//				if (loaded != null)
-		//					list = loaded;
-		//			}
-		//		}
+		String[] yearList = { "2015年", "2016年", "2017年", "2018年", "2019年",
+				"2020年", "2021年", "2022年", "2023年", "2024年", "2025年", "2026年", "全件取得" };
+		JComboBox yearBox = new JComboBox(yearList);
+		buttonPanel.add(yearBox,BorderLayout.WEST);
 
+		String[] monthList = { "01月", "02月", "03月", "04月", "05月", "06月",
+				"07月", "08月", "09月", "10月", "11月", "12月", "全件取得" };
+		JComboBox monthBox = new JComboBox(monthList);
+		buttonPanel.add(monthBox,BorderLayout.CENTER);
+
+		JButton searchbtn = new JButton("検索");
+		buttonPanel.add(searchbtn, BorderLayout.EAST);
+		add(buttonPanel, BorderLayout.NORTH);
+
+		
+		
+
+		//テーブル作成
 		String[] columnNames = { "日付", "項目", "金額", "メモ" };
-
 		DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
-	
+		//JSONの読み込み
 		List<Household> householdList = new ArrayList<>();
-		Household household1 = new Household("2026", "給料", BigDecimal.valueOf(400000), "給料");
-		Household household2 = new Household("2020", "牛乳", BigDecimal.valueOf(500), "高い");
-		Household household3 = new Household("2020", "牛乳", BigDecimal.valueOf(500), "高い");
-		Household household4 = new Household("2020", "牛乳", BigDecimal.valueOf(500), "yas");
-		householdList.add(household1);
-		householdList.add(household2);
-		householdList.add(household3);
-		householdList.add(household4);
+		if (Files.exists(DATA_PATH)) {
+			try (BufferedReader reader = Files.newBufferedReader(DATA_PATH, StandardCharsets.UTF_8)) {
+				List<Household> loaded = GSON.fromJson(reader, LIST_TYPE);
+				if (loaded != null)
+					householdList = loaded;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
 		for (Household in : householdList) {
 			model.addRow(new Object[] {
@@ -69,39 +73,63 @@ public class DetailPanel extends JPanel {
 					in.getMemo()
 			});
 		}
+		JPanel contentPanel = new JPanel(new BorderLayout());
 		JTable table = new JTable(model);
+		JScrollPane scrollPane = new JScrollPane(table);
 
-		JPanel tablepanel = new JPanel();//テーブル用パネル
-		tablepanel.setPreferredSize(new Dimension(700, 500));
-		tablepanel.setBackground(new Color(169, 206, 236));//背景色
+		contentPanel.add(scrollPane, BorderLayout.CENTER);
+		add(contentPanel, BorderLayout.CENTER);
+		//-----------検索機能-----------------------------------------
+		final ArrayList<Household> clonedList = (ArrayList<Household>) householdList;
 
-		JScrollPane scpane = new JScrollPane(table);
-		scpane.setPreferredSize(new Dimension(650, 450));
+		searchbtn.addActionListener(e -> {
+			contentPanel.removeAll();
+			String selectedYear = String.valueOf(yearBox.getSelectedItem()).replaceAll("[^0-9]", "");
+			String selectedMonth = String.valueOf(monthBox.getSelectedItem()).replaceAll("[^0-9]", "");
+			DefaultTableModel selectedModel = new DefaultTableModel(columnNames, 0);
 
-		ArrayList<ArrayList<String>> tablelist = new ArrayList<>();
+			for (Household household : clonedList) {
+				String[] splitedDate = household.getDate().split("-", 3);
 
-		//tablelist.add(new ArrayList<>(Arrays.asList(date, category, price, memo)));
+				if (selectedYear.equals(splitedDate[0]) && selectedMonth.equals(splitedDate[1])) {
+					selectedModel.addRow(new Object[] {
+							household.getDate(),
+							household.getCategory(),
+							household.getPrice(),
+							household.getMemo()
+					});
 
-		for (ArrayList<String> row : tablelist) {
-			System.out.println(String.join("\t", row));
-		}
+				} else if (yearBox.getSelectedItem().equals("全件取得") && selectedMonth.equals(splitedDate[1])) {
+					selectedModel.addRow(new Object[] {
+							household.getDate(),
+							household.getCategory(),
+							household.getPrice(),
+							household.getMemo()
+					});
+				} else if (selectedYear.equals(splitedDate[0]) && monthBox.getSelectedItem().equals("全件取得")) {
+					selectedModel.addRow(new Object[] {
+							household.getDate(),
+							household.getCategory(),
+							household.getPrice(),
+							household.getMemo()
+					});
+				} else if (yearBox.getSelectedItem().equals("全件取得") && monthBox.getSelectedItem().equals("全件取得")) {
+					selectedModel.addRow(new Object[] {
+							household.getDate(),
+							household.getCategory(),
+							household.getPrice(),
+							household.getMemo()
+					});
 
-		//-----------年月検索機能-----------------------------------------
-		JButton serchbtn = new JButton("検索");//検索ボタン
-		add(serchbtn);
-		tablepanel.add(scpane);
+				}
+			}
+			JTable selectedTable = new JTable(selectedModel);
+			JScrollPane scrollPane1 = new JScrollPane(selectedTable);
+			contentPanel.add(scrollPane1);
+			contentPanel.revalidate();
+			contentPanel.repaint();
 
-		String[] combodateyear = { "2015年", "2016年", "2017年", "2018年", "2019年",
-				"2020年", "2021年", "2022年", "2023年", "2024年", "2025年", "2026年" };//monthテキストボックスの中身
-		JComboBox combo2 = new JComboBox(combodateyear);
-		add(combo2);
+		});
 
-		String[] combodatamonth = { "1月", "2月", "3月", "4月", "5月", "6月",
-				"7月", "8月", "9月", "10月", "11月", "12月" };//yearテキストボックスの中身
-		JComboBox combo = new JComboBox(combodatamonth);
-		add(combo);
-
-		add(tablepanel);
-		frame.pack();
 	}
 }
