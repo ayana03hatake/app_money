@@ -26,6 +26,12 @@ github
 ### 一覧画面
 デフォルトの設定では、これまでに入力した収支の一覧が表示されています。
 希望の条件を入れることで特定の期間で絞り込みをかけて検索することも可能です。
+https://github.com/user-attachments/assets/455a4176-e3d1-4f47-9e22-1da600cf707f
+
+
+
+https://github.com/user-attachments/assets/f91532c4-013f-4c79-9fd1-68c85011ce52
+
 
 ## 工夫した点
 ### メンバー１
