@@ -40,6 +40,7 @@ public class InputPanel extends JPanel {
 	}.getType();
 	private HomePanel homePanel;
 	// 日付
+	private DetailPanel detailPanel;
 	private static final DateTimeFormatter STRICT_YYYY_MM_DD = DateTimeFormatter.ofPattern("uuuu-MM-dd")
 			.withResolverStyle(ResolverStyle.STRICT);
 
@@ -53,9 +54,10 @@ public class InputPanel extends JPanel {
 	}
 	// ==============================
 
-	public InputPanel(Main frame, HomePanel homePanel) {
+	public InputPanel(Main frame, HomePanel homePanel, DetailPanel detailPanel) {
 
 		this.homePanel = homePanel;
+		this.detailPanel = detailPanel;
 
 		GridLayout gridLayout = new GridLayout(5, 2, 10, 10);
 		setLayout(gridLayout);
@@ -260,6 +262,7 @@ public class InputPanel extends JPanel {
 				JOptionPane.showMessageDialog(frame, "収入として保存しました！\n" + DATA_PATH.toAbsolutePath());
 
 				homePanel.loadData();//HomePanelに入力されたデータを渡すために追加（相川）
+				detailPanel.updateCategoryList();
 
 			} catch (NumberFormatException nfe) {
 				JOptionPane.showMessageDialog(frame, "金額は数値で入力してください。",
@@ -339,6 +342,7 @@ public class InputPanel extends JPanel {
 				JOptionPane.showMessageDialog(frame, "支出として保存しました！\n" + DATA_PATH.toAbsolutePath());
 
 				homePanel.loadData();//HomePanelに入力されたデータを渡すために追加（相川）
+				detailPanel.updateCategoryList();
 
 			} catch (NumberFormatException nfe) {
 				JOptionPane.showMessageDialog(frame, "金額は数値で入力してください。",
