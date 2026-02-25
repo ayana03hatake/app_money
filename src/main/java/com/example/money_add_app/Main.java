@@ -31,13 +31,12 @@ public class Main extends JFrame implements ActionListener{
         // Home画面
         HomePanel homePanel = new HomePanel(this);
         
-
-        // 入力画面
-        InputPanel inputPanel = new InputPanel(this,homePanel);
-        
-
         // 一覧画面
         DetailPanel detailPanel = new DetailPanel(this);
+        
+
+        // 入力画面
+        InputPanel inputPanel = new InputPanel(this,homePanel,detailPanel);
         
         
       

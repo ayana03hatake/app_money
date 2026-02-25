@@ -7,6 +7,9 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -35,11 +38,15 @@ import com.google.gson.reflect.TypeToken;
 
 public class InputPanel extends JPanel {
 	private static final Path DATA_PATH = Path.of("householdList.json");
+	private static final Path DATA_PATH2 = Path.of("categoryList.json");
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static final Type LIST_TYPE = new TypeToken<List<Household>>() {
 	}.getType();
+	private static final Type LIST_TYPE2 = new TypeToken<String>() {
+	}.getType();
 	private HomePanel homePanel;
 	// 日付
+	private DetailPanel detailPanel;
 	private static final DateTimeFormatter STRICT_YYYY_MM_DD = DateTimeFormatter.ofPattern("uuuu-MM-dd")
 			.withResolverStyle(ResolverStyle.STRICT);
 
@@ -51,11 +58,14 @@ public class InputPanel extends JPanel {
 			return false;
 		}
 	}
+
+	private JComboBox<String> categoryBox;
 	// ==============================
 
-	public InputPanel(Main frame, HomePanel homePanel) {
+	public InputPanel(Main frame, HomePanel homePanel, DetailPanel detailPanel) {
 
 		this.homePanel = homePanel;
+		this.detailPanel = detailPanel;
 
 		GridLayout gridLayout = new GridLayout(5, 2, 10, 10);
 		setLayout(gridLayout);
@@ -63,11 +73,13 @@ public class InputPanel extends JPanel {
 
 		JLabel datelabel = new JLabel("日付");
 
-		String[] categorycombo = {
-				"家賃", "水道", "ガス", "電気", "食費",
-				"稽古", "化粧品", "外食費", "飲料", "娯楽費", "交際費", "趣味"
-		};
-		JComboBox categorybox = new JComboBox<>(categorycombo);
+		//		String[] categorycombo = {
+		//				"家賃", "水道", "ガス", "電気", "食費",
+		//				"稽古", "化粧品", "外食費", "飲料", "娯楽費", "交際費", "趣味"
+		//		};
+		categoryBox = new JComboBox();
+
+		updateCategoryList1();
 
 		JLabel categorylabel = new JLabel("カテゴリー");
 		JLabel pricelabel = new JLabel("金額");
@@ -110,28 +122,36 @@ public class InputPanel extends JPanel {
 		add(datelabel);
 		add(dateField);
 		add(categorylabel);
-		add(categorybox);
+		add(categoryBox);
 		add(pricelabel);
 		add(priceField);
 		add(memolabel);
 		add(memoField);
 
+		//===========変更=============================
+
 		// ボタン用パネル
 		JPanel buttunface = new JPanel();
+		buttunface.setLayout(new GridLayout(2, 2, 10, 10));
 		buttunface.setBackground(new Color(175, 223, 228));
-
-		JButton categoryButton = new JButton("カテゴリーを追加"); // （動作は未実装）
+		JButton categoryButton = new JButton("カテゴリーを追加");
 		buttunface.add(categoryButton);
 
-		//=========================追加項目===================================
+		//=========================変更終わり===================================
+
 		//ボタンを押したらポップアップが表示される		
+
+		DefaultComboBoxModel<String> categoryModel = (DefaultComboBoxModel<String>) categoryBox.getModel();
+		//カテゴリーボックスの中身をカテゴリーモデルという名前で読み込みます
 		categoryButton.addActionListener(e -> {
+
 			String input = JOptionPane.showInputDialog(
 					frame, //親
 					"追加するカテゴリー名を入力してください", //オブジェクトの追加
 					"カテゴリーを追加する", //枠のタイトル
 					JOptionPane.PLAIN_MESSAGE);//エラー五種の１つ
-
+			if (input == null)
+				return;
 			String new_category = input.trim();
 			if (new_category.isEmpty()) {
 				JOptionPane.showMessageDialog(
@@ -141,17 +161,16 @@ public class InputPanel extends JPanel {
 						JOptionPane.ERROR_MESSAGE);
 				return;//戻る
 			}
-			DefaultComboBoxModel<String> categoryModel = (DefaultComboBoxModel<String>) categorybox.getModel();
 
-			//カテゴリーモデルにすでにあるのでキャンセル(重複処理)
+			//=====カテゴリーモデルにすでにあるのでキャンセル(重複処理)=========
 
-			boolean exits = false;//何も見つけてない状態
+			boolean exits = false;//何も見つけてない状態に
 			for (int i = 0; i < categoryModel.getSize(); i++) {//カテゴリーの中身を全部見る式
 				String categoryel = categoryModel.getElementAt(i);
 
 				if (categoryel == null) {
 					continue;
-				} //モデルの中身が空行のとき比較ができないので次の処理へ
+				} //モデルの中身が空のとき比較ができないので次の処理へ
 				if (new_category.equals(categoryel)) {
 					exits = true;//見つけました
 					break;//みつけたので終わります
@@ -166,17 +185,78 @@ public class InputPanel extends JPanel {
 
 			} else {
 				categoryModel.addElement(new_category);
-				JOptionPane.showMessageDialog(
-						frame,
-						"カテゴリーに追加出来ました。",
-						"完了",
-						JOptionPane.PLAIN_MESSAGE);
+				List<String> categoryList = new ArrayList<>();
+				for (int i = 0; i < categoryModel.getSize(); i++) {
+					categoryList.add(categoryModel.getElementAt(i));
+				}
 
+				try (FileWriter writer = new FileWriter("categoryList.json")) {
+					GSON.toJson(categoryList, writer);
+					JOptionPane.showMessageDialog(
+							frame,
+							"カテゴリーに追加出来ました。",
+							"完了",
+							JOptionPane.PLAIN_MESSAGE);
+				} catch (IOException e1) {
+					System.out.println("エラーが発生しています");
+				}
 			}
 
 		});
+		//==================================delete start====================================
 
-		//=========================追加項目===================================
+		JButton deleteCategoryBtn = new JButton("カテゴリー削除");
+		buttunface.add(deleteCategoryBtn);
+
+		deleteCategoryBtn.addActionListener(e -> {
+			String input = JOptionPane.showInputDialog(
+					frame, //親
+					"削除するカテゴリー名を入力してください", //オブジェクトの追加
+					"カテゴリーを削除する", //枠のタイトル
+					JOptionPane.PLAIN_MESSAGE);//エラー五種の１つ
+			if (input == null)
+				return;
+			String new_category = input.trim();
+			if (new_category.isEmpty()) {
+				JOptionPane.showMessageDialog(
+						frame,
+						"削除したいカテゴリー名を入れてください",
+						"入力エラー",
+						JOptionPane.ERROR_MESSAGE);
+				return;//戻る
+			}
+
+			boolean remove = false;//何も見つけてない状態に
+			for (int i = 0; i < categoryModel.getSize(); i++) {//カテゴリーの中身を全部見る式
+				String categoryel2 = categoryModel.getElementAt(i);
+
+				if (categoryel2 == null) {
+					continue;
+				} //モデルの中身が空のとき比較ができないので次の処理へ
+				if (new_category.equals(categoryel2)) {
+
+					categoryModel.removeElement(new_category);
+					List<String> categoryList = new ArrayList<>();
+					for (int j = 0; j < categoryModel.getSize(); j++) {
+						categoryList.add(categoryModel.getElementAt(j));
+					}
+					try (FileWriter writer = new FileWriter("categoryList.json")) {
+						GSON.toJson(categoryList, writer);
+						JOptionPane.showMessageDialog(
+								frame,
+								"カテゴリーから削除しました。",
+								"完了",
+								JOptionPane.PLAIN_MESSAGE);
+					} catch (IOException e1) {
+						System.out.println("エラーが発生しています");
+					}
+					remove = true;//見つけました
+
+				}
+			}
+
+		});
+		//==================================delete finish====================================
 
 		JButton outcome = new JButton("支出として登録");
 		JButton income = new JButton("収入として登録");
@@ -186,7 +266,7 @@ public class InputPanel extends JPanel {
 		frame.setLocationRelativeTo(null); // 中央揃え
 		frame.setSize(1000, 800);
 		frame.add(buttunface, BorderLayout.SOUTH);
-		add(buttunface);
+
 		add(new JLabel()); // 左セルを空ける
 		add(buttunface); // パネルに表示
 		frame.setVisible(true);
@@ -209,7 +289,7 @@ public class InputPanel extends JPanel {
 
 				// カテゴリはテキスト優先。未入力ならコンボの選択を使う
 				String categoryTyped = categoryField.getText().trim();
-				String categorySelected = (String) categorybox.getSelectedItem();
+				String categorySelected = (String) categoryBox.getSelectedItem();
 				String category = categoryTyped.isEmpty() ? categorySelected : categoryTyped;
 
 				String priceText = priceField.getText().trim();
@@ -260,6 +340,7 @@ public class InputPanel extends JPanel {
 				JOptionPane.showMessageDialog(frame, "収入として保存しました！\n" + DATA_PATH.toAbsolutePath());
 
 				homePanel.loadData();//HomePanelに入力されたデータを渡すために追加（相川）
+				detailPanel.updateCategoryList();
 
 			} catch (NumberFormatException nfe) {
 				JOptionPane.showMessageDialog(frame, "金額は数値で入力してください。",
@@ -287,7 +368,7 @@ public class InputPanel extends JPanel {
 				}
 
 				String categoryTyped = categoryField.getText().trim();
-				String categorySelected = (String) categorybox.getSelectedItem();
+				String categorySelected = (String) categoryBox.getSelectedItem();
 				String category = categoryTyped.isEmpty() ? categorySelected : categoryTyped;
 
 				String priceText = priceField.getText().trim();
@@ -339,6 +420,7 @@ public class InputPanel extends JPanel {
 				JOptionPane.showMessageDialog(frame, "支出として保存しました！\n" + DATA_PATH.toAbsolutePath());
 
 				homePanel.loadData();//HomePanelに入力されたデータを渡すために追加（相川）
+				detailPanel.updateCategoryList();
 
 			} catch (NumberFormatException nfe) {
 				JOptionPane.showMessageDialog(frame, "金額は数値で入力してください。",
@@ -351,4 +433,22 @@ public class InputPanel extends JPanel {
 			}
 		});
 	}
+
+	public void updateCategoryList1() {
+		categoryBox.removeAll();
+
+		try (FileReader reader = new FileReader("categoryList.json")) {
+			Gson gson = new GsonBuilder().create();
+			Type listType = new TypeToken<List<String>>() {
+			}.getType();
+			List<String> categoryList = gson.fromJson(reader, listType);
+
+			for (String category : categoryList) {
+				categoryBox.addItem(category);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }
