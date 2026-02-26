@@ -58,5 +58,11 @@
     "category": "食費",
     "price": -2000,
     "memo": "同僚とランチ"
+  },
+  {
+    "date": "2022-04-16",
+    "category": "aaa",
+    "price": -1000,
+    "memo": "test"
   }
 ]

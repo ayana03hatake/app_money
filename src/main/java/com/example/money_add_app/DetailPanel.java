@@ -48,11 +48,6 @@ public class DetailPanel extends JPanel {
 		JComboBox monthBox = new JComboBox(monthList);
 		buttonPanel.add(monthBox);
 
-		//		String[] categoryList = {
-		//				"家賃", "水道", "ガス", "電気", "食費",
-		//				"稽古", "化粧品", "外食費", "飲料", "娯楽費", "交際費", "趣味", "全件取得"
-		//		};
-		//JSONの読み込み
 
 		categoryBox = new JComboBox();
 		buttonPanel.add(categoryBox);
@@ -145,7 +140,7 @@ public class DetailPanel extends JPanel {
 	}
 
 	public void updateCategoryList() {
-		categoryBox.removeAll();
+		categoryBox.removeAllItems();
 
 		try (FileReader reader = new FileReader("categoryList.json")) {
 			Gson gson = new GsonBuilder().create();

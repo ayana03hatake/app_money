@@ -69,8 +69,7 @@ public class InputPanel extends JPanel {
 
 		GridLayout gridLayout = new GridLayout(5, 2, 10, 10);
 		setLayout(gridLayout);
-		setBackground(new Color(175, 223, 228)); // 背景色
-
+		setBackground(new Color(255, 255, 229)); // 背景色
 		JLabel datelabel = new JLabel("日付");
 
 		//		String[] categorycombo = {
@@ -78,7 +77,9 @@ public class InputPanel extends JPanel {
 		//				"稽古", "化粧品", "外食費", "飲料", "娯楽費", "交際費", "趣味"
 		//		};
 		categoryBox = new JComboBox();
-
+		Font combo = new Font("ＭＳ ゴシック", Font.BOLD, 20);
+		categoryBox.setBackground(new Color(255, 239, 224));
+		categoryBox.setFont(combo);
 		updateCategoryList1();
 
 		JLabel categorylabel = new JLabel("カテゴリー");
@@ -127,14 +128,16 @@ public class InputPanel extends JPanel {
 		add(priceField);
 		add(memolabel);
 		add(memoField);
-
+		Font font = new Font("ＭＳ ゴシック", Font.BOLD, 13);
 		//===========変更=============================
 
 		// ボタン用パネル
 		JPanel buttunface = new JPanel();
 		buttunface.setLayout(new GridLayout(2, 2, 10, 10));
-		buttunface.setBackground(new Color(175, 223, 228));
-		JButton categoryButton = new JButton("カテゴリーを追加");
+		buttunface.setBackground(new Color(255, 255, 229));
+		JButton categoryButton = new JButton("カテゴリー追加");
+		categoryButton.setFont(font);
+		categoryButton.setBackground(new Color(255, 229, 242));
 		buttunface.add(categoryButton);
 
 		//=========================変更終わり===================================
@@ -201,11 +204,13 @@ public class InputPanel extends JPanel {
 					System.out.println("エラーが発生しています");
 				}
 			}
-
+			detailPanel.updateCategoryList();
 		});
 		//==================================delete start====================================
 
 		JButton deleteCategoryBtn = new JButton("カテゴリー削除");
+		deleteCategoryBtn.setFont(font);
+		deleteCategoryBtn.setBackground(new Color(204, 229, 255));
 		buttunface.add(deleteCategoryBtn);
 
 		deleteCategoryBtn.addActionListener(e -> {
@@ -227,6 +232,7 @@ public class InputPanel extends JPanel {
 			}
 
 			boolean remove = false;//何も見つけてない状態に
+			boolean errorInput = true; 
 			for (int i = 0; i < categoryModel.getSize(); i++) {//カテゴリーの中身を全部見る式
 				String categoryel2 = categoryModel.getElementAt(i);
 
@@ -234,8 +240,10 @@ public class InputPanel extends JPanel {
 					continue;
 				} //モデルの中身が空のとき比較ができないので次の処理へ
 				if (new_category.equals(categoryel2)) {
+					errorInput = false;
 
 					categoryModel.removeElement(new_category);
+					
 					List<String> categoryList = new ArrayList<>();
 					for (int j = 0; j < categoryModel.getSize(); j++) {
 						categoryList.add(categoryModel.getElementAt(j));
@@ -247,6 +255,7 @@ public class InputPanel extends JPanel {
 								"カテゴリーから削除しました。",
 								"完了",
 								JOptionPane.PLAIN_MESSAGE);
+	
 					} catch (IOException e1) {
 						System.out.println("エラーが発生しています");
 					}
@@ -254,12 +263,24 @@ public class InputPanel extends JPanel {
 
 				}
 			}
-
+			if(errorInput) {
+				JOptionPane.showMessageDialog(
+						frame,
+						"存在しないカテゴリーです",
+						"入力エラー",
+						JOptionPane.ERROR_MESSAGE);
+			}
+			detailPanel.updateCategoryList();
+			
 		});
 		//==================================delete finish====================================
 
 		JButton outcome = new JButton("支出として登録");
+		outcome.setFont(font);
+		outcome.setBackground(new Color(204, 229, 255));
 		JButton income = new JButton("収入として登録");
+		income.setFont(font);
+		income.setBackground(new Color(255, 229, 242));
 		buttunface.add(income);
 		buttunface.add(outcome);
 
